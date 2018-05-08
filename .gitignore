@@ -1,0 +1,8 @@
+env/
+log/
+db.sqlite3
+poe/build
+poe/migrations
+.vscode
+web/__pycache__
+*.pyc

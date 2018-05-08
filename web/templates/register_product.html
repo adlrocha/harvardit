@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block contents %}
+
+<br>
+<br>
+<h1 class="text-center">Register new product into the catalog</h1>
+
+<br>
+<br>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-6">
+      <form action="{% url 'register_product' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="name">Product name</label>
+          <input type="text" class="form-control" id="name" name="product_name" placeholder="Enter name" required>
+        </div>
+        <div class="form-group">
+          <label for="description">Product description</label>
+          <input type="text" class="form-control" id="description" name="product_description" placeholder="Enter description" required>
+        </div>
+        <div class="form-group">
+          <label for="image">Product image</label>
+          <input type="url" class="form-control" id="image" name="product_image" placeholder="Enter image URL" required>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-3">
+            <button type="submit" class="btn btn-primary">Register</button>
+          </div>
+          <div class="col-3">
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='{% url 'catalog' %}'">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

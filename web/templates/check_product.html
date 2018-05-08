@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block contents %}
+
+<br>
+<br>
+
+<h1 class="text-center">Check a product from its id</h1>
+
+<br>
+<br>
+
+{% if product %}
+  <h3 class="text-center">Product detail</h3>
+  <div class="container">
+    <div class="detail_div">
+      <div class="row justify-content-center">
+        <div class="col-5 text-center">
+          <img class="w-100" src="{{ product.imageUrl }}">
+        </div>
+      </div>
+      <br>
+      <br>
+      <div class="row justify-content-center">
+        <div class="col-3">Id:</div>
+        <div class="col-3" id="product-detail-id">{{ product.assetId }}</div>
+      </div>
+      <br>
+      <div class="row justify-content-center">
+        <div class="col-3">Name:</div>
+        <div class="col-3">{{ product.name }}</div>
+      </div>
+      <br>
+      <div class="row justify-content-center">
+        <div class="col-3">Description:</div>
+        <div class="col-3">{{ product.description }}</div>
+      </div>
+      <br>
+      {% if owners %}
+      <div class="row justify-content-center">
+        <div class="col-1"></div>
+        <div class="col-3">Owners:</div>
+        <div class="col-4">
+          {% for owner in owners %}
+            <div class="row mb-2">
+              <div class="col-5">
+                {{ owner.owner }}
+              </div>
+              <div class="col-7">
+                {{ owner.timestamp }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+    </div>
+  </div>
+  <br>
+  <p class="text-center">Want to check another product?</p>
+{% else %}
+
+<p class="text-center">Here you can check the product details and its ownership history entering its id</p>
+
+{% endif %}
+
+<br>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-4">
+      <div class="input-group">
+        <input type="text" class="form-control" id="product_id" placeholder="Product ID" required>
+      </div>
+      <br>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col text-center">
+      <button type="button" id="check_button" class="btn btn-primary text-center">Check!</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  $("#check_button").click(function(event) {
+    product_id = $("#product_id").val();
+    if(product_id != "") {
+      window.location.href = "/check_product/" + product_id;
+    }
+  });
+
+</script>
+
+{% endblock %}

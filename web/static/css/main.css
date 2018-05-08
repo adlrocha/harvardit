@@ -1,0 +1,32 @@
+body{
+	padding-bottom: 130px;
+}
+
+footer {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 1rem;
+	background-color: #eee;
+}
+
+.detail_div {
+	background-color: #fafafa; 
+	border: 1px solid #bbb; 
+	padding: 15px;
+}
+
+.disabled_detail {
+	background-color: #ccc;
+	color:#777;
+    cursor: not-allowed;
+}
+
+#transfer-button:disabled {
+    cursor: not-allowed;
+}
+
+.product_row {
+	cursor: pointer;
+}
