@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+
+
+{% block contents %}
+
+<br>
+<br>
+
+
+<br>
+
+<div class="content">
+  <div class="row justify-content-around">
+    <div class="col-4">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Alumnos de {{ request.user.first_name }} {{ request.user.last_name }} </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %}
+          <tr class="student_row">
+            <td>
+              <span class="student_fullname">{{ student.user.first_name }} {{ student.user.last_name }} </span>
+              <span class="d-none student_username">{{ student.user.username }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-4">
+
+      <h4>Expediente de <span id="title_student">[seleccione alumno]</span></h4>
+      <br>
+      <div id="academic_record" class="academic_record_disabled">
+
+        <div class="row">
+          <div class="col-1"></div>
+          <div class="col">
+            <strong>Asignatura 1: </strong>
+          </div>
+          <div class="col" id="subject_1"></div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-1"></div>
+          <div class="col">
+            <strong>Asignatura 2: </strong>
+          </div>
+          <div class="col" id="subject_2"></div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-1"></div>
+          <div class="col">
+            <strong>Asignatura 3: </strong>
+          </div>
+          <div class="col" id="subject_3"></div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-1"></div>
+          <div class="col">
+            <strong>Tesis:</strong>
+          </div>
+          <div class="col">
+            <strong id="tesis_val"></strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+  $(".student_row").click(function(event) {
+      
+    
+    $(".overlay").fadeIn( "fast" );
+    student_username = $(this).find(".student_username").text();
+    student_fullname = $(this).find(".student_fullname").text();
+    console.log("student_username->" + student_username);
+
+    $("#title_student").text(student_fullname);
+
+    $("#hidden_student").val(student_username);
+
+    $.ajax({
+      url: '/get_student_info/' + student_username,
+      type: 'GET',
+    })
+    .done(function(data) {
+      console.log("success");
+      $(".overlay").fadeOut( "fast" );
+      console.log(data);
+
+      $("#academic_record").removeClass('academic_record_disabled');
+      for (var i = 1; i <= data['grades'].length; i++) {
+        var grade = data['grades'][i-1];
+        if(grade == -1) {
+          var new_html = '';
+          new_html += '<form action="{% url "add_grade" %}" method="post">\n';
+          new_html += "{% csrf_token %}\n";
+          new_html += '<input type="hidden" name="subject_number" value="' + (i-1) + '">\n';
+          new_html += '<input type="hidden" name="student_username" value="' + student_username + '">\n';
+          new_html += '<div class="form-row">\n';
+          new_html += '<div class="col-4"><input class="mw-100" type="number" name="grade_value" required></div>\n';
+          new_html += '<div class="col-1"></div>\n';
+          new_html += '<div class="col-6"><input class="btn btn-primary" type="submit" value="Calificar"></div>\n';
+          new_html += '</div>\n';
+          new_html += '</form>\n';
+          $("#subject_" + i).html(new_html);
+        } else {
+          $("#subject_" + i).text(grade);
+        }
+      }
+
+      if(data['degree_obtained']) {
+        $("#tesis_val").text('Entregada');
+        $("#tesis_val").css('color', 'green');
+      } else {
+        $("#tesis_val").text('No entregada');
+        $("#tesis_val").css('color', 'red');
+      }
+
+      
+    })
+    .fail(function() {
+
+      $(".overlay").fadeOut( "fast" );
+      console.log("error");
+    })
+    
+  });
+</script>
+
+{% endblock %}

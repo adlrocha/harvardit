@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+
+
+{% block contents %}
+
+<br>
+<br>
+
+<br>
+
+<div class="container">
+  <div class="row justify-content-around">
+    <div class="col-4">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Alumnos</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %}
+          <tr class="student_row">
+            <td>
+              <span class="student_fullname">{{ student.user.first_name }} {{ student.user.last_name }} </span>
+              <span class="d-none student_username">{{ student.user.username }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-4">
+      <h4>Profesores de <span id="title_student">[seleccione alumno]</span></h4>
+      <form action="{% url 'add_professors' %}" method="post">
+
+        <input type="hidden" id="hidden_student" name="student_username">
+        <div id="professors_div">
+
+        </div>
+        <br>
+        <button id="add_professor_button" class="btn btn-primary" type="submit" style="display: none;">Añadir</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+  $(".student_row").click(function(event) {
+    $(".overlay").fadeIn( "fast" );
+    
+    student_username = $(this).find(".student_username").text();
+    student_fullname = $(this).find(".student_fullname").text();
+    console.log("student_username->" + student_username);
+
+    $("#title_student").text(student_fullname);
+
+    $("#hidden_student").val(student_username);
+
+    $.ajax({
+      url: '/get_professors/' + student_username,
+      type: 'GET',
+    })
+    .done(function(data) {
+      console.log("success");
+      $(".overlay").fadeOut( "fast" );
+
+      $("#add_professor_button").fadeIn('fast');
+
+      var new_html = '';
+
+      new_html += "{% csrf_token %}\n";
+      for (var i = 0; i < data['professors'].length; i++) {
+        var p = data['professors'][i];
+        var fullname = p['user__first_name'] + ' ' + p['user__last_name'];
+        var username = p['user__username'];
+        var checked = '';
+        if(p['already_selected']) {
+          checked = 'checked disabled';
+        }
+        new_html += '<div class="form-check">';
+        new_html += '<input class="form-check-input" type="checkbox" name="professor" id="' + username + '" value="' + username + '" ' + checked + '>';
+        new_html += '<label class="form-check-label" for="' + username + '">' + fullname + '</label>';
+        new_html += '</div><br>';
+      }
+      $("#professors_div").html(new_html);
+    })
+    .fail(function() {
+
+      $(".overlay").fadeOut( "fast" );
+      console.log("error");
+    })
+    
+  });
+</script>
+{% endblock %}

@@ -6,3 +6,4 @@ poe/migrations
 .vscode
 web/__pycache__
 *.pyc
+harvardit/harvardit/eth_settings.py

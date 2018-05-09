@@ -1,0 +1,73 @@
+body{
+	padding-bottom: 130px;
+}
+
+footer {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 1rem;
+	background-color: #eee;
+}
+
+.student_row {
+	cursor: pointer;
+}
+
+.student_row:hover{
+	background-color: #ddc!important;
+}
+
+#professors_div {
+	background-color: #f0f0f0;
+	padding: 20px;
+	min-height: 200px;
+	max-height: 500px;
+	overflow-y: scroll;
+}
+
+#academic_record {
+	padding: 20px;
+	background-color: #f0f0f0;
+}
+
+.academic_record_disabled {
+	color: #999;
+	background-color: #ccc!important;
+}
+
+#diploma {
+	width: 50%;
+	margin: auto;
+    background-color: #cb8;
+    padding: 20px 0;
+    border: 1px solid #441;
+}
+
+
+
+.overlay {
+  height: 100%;
+  width: 100%;
+  position: fixed; 
+  z-index: 19999; 
+  left: 0;
+  top: 0;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0, 0.7);
+  overflow-x: hidden;
+  display: none;
+}
+
+.overlay-content {
+  position: relative;
+  top: 25%;
+  width: 100%;
+  text-align: center;
+}
+
+#loadingGif {
+  z-index:20000;
+  opacity: 0.8;
+}

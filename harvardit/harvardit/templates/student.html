@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+
+
+{% block contents %}
+
+<br>
+<br>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <h4>Expediente académico de: </h4>
+  </div>
+  <div class="row justify-content-center">
+    <h2>{{ request.user.first_name }} {{ request.user.last_name }} </h2>
+  </div>
+</div>
+<br>
+
+{% if sc_address %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-6">
+        <p class="text-center">La dirección del Smart Contract correspondiente a este expediente es <strong>{{ sc_address }}</strong></p>
+      </div>
+    </div>
+
+    <br>
+
+    <div class="row justify-content-center">
+      <div class="col-4">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th class="text-center" colspan="100%">Asignaturas</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for grade in grades %}
+            <tr>
+              <td>
+                <strong>Asignatura {{ forloop.counter }}</strong>
+              </td>
+              <td>
+                {% if grade == -1 %}NO PRESENTADO {% else %}{{ grade }}{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <br>
+    {% if subjects_completed%}
+      {% if degree_obtained %}
+        <div class="row justify-content-center">
+          <div class="col-6 text-center">
+            <h5>Tesis</h5>
+            <p>Enviaste tu tesis correctamente</p>
+          </div>
+        </div>
+      {% else %}
+        <div class="row justify-content-center">
+          <div class="col-6 text-center">
+            <h5>Tesis</h5>
+            <p>Al haber completado las asignaturas, puedes ahora enviar tu tesis.</p>
+          </div>
+        </div>
+        <div class="row justify-content-center">
+          <div class="col-5">
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="thesis">
+              <label class="custom-file-label" for="thesis">Selecciona el documento con tu tesis</label>
+            </div>
+          </div>
+          <div class="col-1">
+            <form id="thesis_form" action="{% url 'send_thesis' %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" id="thesis_hash" name="thesis_hash">
+              <input class="btn btn-primary" id="thesis_button" type="submit" value="Enviar" disabled>
+            </form>
+          </div>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="row justify-content-center">
+        <div class="col-6 text-center">
+          <h5>Tesis</h5>
+          <p>Cuando hayas superado las asignaturas podrás subir tu tesis.</p>
+        </div>
+      </div>
+    {% endif %}
+    <br>
+    <div class="row justify-content-center">
+      <div class="col-6 text-center">
+        <h5>Título</h5>
+      </div>
+    </div>
+    <br>
+    {% if degree_obtained %}
+      <div id="diploma">
+        <div class="row justify-content-center">
+          <div class="col-8 text-center">
+            <h4>Título universitario</h4>
+            <h5>Entregado a {{ request.user.first_name }} {{ request.user.last_name }}</h5>
+          </div>
+        </div>
+        <br>
+        <div class="row justify-content-around">
+          <div class="col-1"></div>
+          <div class="col-3">
+            <img class="mw-100" src="{% static 'images/approved.png' %}">
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="row justify-content-center">
+        <div class="col-6 text-center">
+          <p>Podrás obtener el título cuando hayas superado todas las asignaturas y entregado la tesis.</p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% else %}
+  <h3>El Smart Contract aún no ha sido validado en la Blockchain o se ha producido un error</h3>
+{% endif %}
+
+<script>
+  $('.custom-file-input').on('change', function() {
+    let fileName = $(this).val().split('\\').pop();
+    $(this).siblings('.custom-file-label').addClass("selected").html(fileName);
+});
+
+  var hashResult;
+  var stoken = '{{ csrf_token }}';
+  function sendHash(hashcode) {
+    $(".overlay").fadeIn( "fast" );
+    $('#sendForm').submit();
+  };
+
+  function handleFileSelect(evt) {
+
+    $(".overlay").fadeIn( "fast" );
+
+    var files = evt.target.files;
+
+
+    var progress = function(p) {
+      var w = ((p * 100).toFixed(0));
+    };
+
+    var finished = function(result) {
+      
+      $(".overlay").fadeOut( "fast" );
+
+      hashResult = result.toString(CryptoJSH.enc.Hex);
+      console.log("SHA-256-> " + hashResult);
+      $('#thesis_button').prop("disabled", false);
+      $('#thesis_hash').val(hashResult);
+    };
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var data = e.target.result;
+      setTimeout(function() {
+        var a = CryptoJSH.SHA256(data, progress, finished);
+      }, 200);
+    };
+    reader.onprogress = function(evt) {
+      if (evt.lengthComputable) {
+        var w = (((evt.loaded / evt.total) * 100).toFixed(2));
+      }
+    };
+    reader.readAsBinaryString(document.getElementById('thesis').files[0]);
+  }
+
+
+  document.getElementById('thesis').addEventListener('change', handleFileSelect, false);
+</script>
+
+{% endblock %}

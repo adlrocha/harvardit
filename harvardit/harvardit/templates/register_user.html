@@ -1,0 +1,47 @@
+{% extends "base_index.html" %}
+
+{% load staticfiles %}
+
+{% block contents %}
+
+  <div class="row justify-content-center">
+    <div class="col-6">
+      <form action="" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" class="form-control" name="username" id="username" placeholder="Username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
+        </div>
+        <div class="form-group">
+          <label for="password2">Repetir password</label>
+          <input type="password" class="form-control" name="password2" id="password2" placeholder="Repeat password" required>
+        </div>
+        <div class="form-group">
+          <label for="firstname">Nombre</label>
+          <input type="text" class="form-control" name="firstname" id="firstname" placeholder="First name" required>
+        </div>
+        <div class="form-group">
+          <label for="lastname">Apellidos</label>
+          <input type="text" class="form-control" name="lastname" id="lastname" placeholder="Last name" required>
+        </div>
+        <div class="form-group">
+          <label for="lastname">Perfil</label>
+          <select class="form-control" name="role" id="role" >
+            <option value="student">Estudiante</option>
+            <option value="professor">Profesor</option>
+            <option value="university">Universidad</option>
+          </select>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Registrar</button>
+      </form>
+      
+    </div>
+  </div>
+
+
+  {% endblock %}

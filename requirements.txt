@@ -1,3 +1,4 @@
 Django==2.0.4
 django-bootstrap4==0.0.6
 requests==2.18.4
+web3==4.2.0
