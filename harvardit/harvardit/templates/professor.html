@@ -38,7 +38,8 @@
       <h4>Expediente de <span id="title_student">[seleccione alumno]</span></h4>
       <br>
       <div id="academic_record" class="academic_record_disabled">
-
+        <input type="hidden" id="hidden_student">
+        <input type="hidden" id="hidden_thesis">
         <div class="row">
           <div class="col-1"></div>
           <div class="col">
@@ -72,6 +73,30 @@
             <strong id="tesis_val"></strong>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="validateModal" tabindex="-1" role="dialog" aria-labelledby="validateModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="validateModalLabel">Validar tesis</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Selecciona el documento de la tesis para contrastarlo con el registrado en la blockchain</p>
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" id="thesis">
+          <label class="custom-file-label" for="thesis">Selecciona el documento con la tesis</label>
+        </div>
+        <br>
+        <input class="btn btn-primary mt-4 float-right" id="thesis_button" type="submit" value="Comprobar" disabled>
+        <br>
+        <div><h4 class="text-center" id="validation_result" ></h4></div>
       </div>
     </div>
   </div>
@@ -123,7 +148,7 @@
       }
 
       if(data['degree_obtained']) {
-        $("#tesis_val").text('Entregada');
+        $("#tesis_val").html('<p>Entregada</p><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#validateModal">Validar</button>');
         $("#tesis_val").css('color', 'green');
       } else {
         $("#tesis_val").text('No entregada');
@@ -139,6 +164,83 @@
     })
     
   });
+
+
+    function handleFileSelect(evt) {
+
+    $(".overlay").fadeIn( "fast" );
+
+    var files = evt.target.files;
+
+
+    var progress = function(p) {
+      var w = ((p * 100).toFixed(0));
+    };
+
+    var finished = function(result) {
+      
+      $(".overlay").fadeOut( "fast" );
+
+      hashResult = result.toString(CryptoJSH.enc.Hex);
+      console.log("SHA-256-> " + hashResult);
+      $('#hidden_thesis').val(hashResult);
+      
+      $('#thesis_button').prop("disabled", false);
+
+
+      
+    };
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var data = e.target.result;
+      setTimeout(function() {
+        var a = CryptoJSH.SHA256(data, progress, finished);
+      }, 200);
+    };
+    reader.onprogress = function(evt) {
+      if (evt.lengthComputable) {
+        var w = (((evt.loaded / evt.total) * 100).toFixed(2));
+      }
+    };
+    reader.readAsBinaryString(document.getElementById('thesis').files[0]);
+  }
+
+
+  document.getElementById('thesis').addEventListener('change', handleFileSelect, false);
+  
+
+  $('#thesis_button').click(function(event) {
+    var student_username = $("#hidden_student").val();
+    var thesis_hash = $("#hidden_thesis").val();
+    $.ajax({
+      url: '/check_thesis/' + student_username + '/' + thesis_hash
+    })
+    .done(function(data) {
+      console.log("success");
+      console.log(data);
+      if(data['match'] == true) {
+        $("#validation_result").text("✓ Coincide");
+      } else {
+        $("#validation_result").text("✗ No coincide");
+
+      }
+    })
+    .fail(function() {
+      console.log("error");
+    })
+  });
+
+  $('#validateModal').on('hidden.bs.modal', function () {
+    $("#validation_result").text("");
+  });
+
+  $('.custom-file-input').on('change', function() {
+    let fileName = $(this).val().split('\\').pop();
+    $(this).siblings('.custom-file-label').addClass("selected").html(fileName);
+    $("#validation_result").text("");
+  });
+
 </script>
 
 {% endblock %}

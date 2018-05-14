@@ -30,6 +30,13 @@
 
 {% block contents %}
 {% endblock %}
+
+  <div class="overlay">
+      <div class="overlay-content">
+          <img id="loadingGif" src="{% static 'images/loading.gif' %}" />
+      </div>
+  </div>
+
   <footer>
     <section>
       <div class="row">
@@ -52,4 +59,12 @@
       </div>
     </section>
   </footer>
+
+
+  <script>
+    $("form").submit(function(event) {
+      $(".overlay").fadeIn( "fast" );
+    });
+  </script>
+  
 </body>

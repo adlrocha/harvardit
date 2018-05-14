@@ -205,6 +205,17 @@ def send_thesis_view(request):
             messages.error(request, "Error al enviar tesis")
     return HttpResponseRedirect(reverse('home'))
 
+@login_required
+def check_thesis_view(request, student_name, doc_hash):
+    try:
+        student = Student.objects.get(user__username=student_name)
+    except Student.DoesNotExist:
+        logger.info("El usuario no existe")
+        return JsonResponse({})
+    bc_thesis_hash = get_thesis_hash(student).hex()
+    logger.debug(f'Thesis hash-> {bc_thesis_hash}')
+    return JsonResponse({'match': doc_hash == bc_thesis_hash})
+
 
 #############
 # FUNCTIONS #
@@ -342,6 +353,16 @@ def send_thesis_blockchain(student, thesis_hash):
                                                                                         'gas': default_gas
                                                                                         }
                                                                                     )
+
+def get_thesis_hash(student):
+    logger.info(f'Getting thesis hash from student {student}')
+    sc_address = get_sc_address(student)
+    if not sc_address:
+        return False
+
+    contract = get_web3().eth.contract(address=sc_address, abi=json.loads(SC_ABI))
+    thesis = contract.functions.thesis().call()
+    return thesis
 
 def professors_to_list(qs, selected):
     return list(qs.annotate(already_selected=Value(selected, output_field=BooleanField())) \

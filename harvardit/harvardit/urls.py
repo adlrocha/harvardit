@@ -15,4 +15,5 @@ urlpatterns = [
     path('get_student_info/<str:student_name>', views.get_student_info_view, name='get_student_info'),
     path('add_grade', views.add_grade_view, name='add_grade'),
     path('send_thesis', views.send_thesis_view, name='send_thesis'),
+    path('check_thesis/<str:student_name>/<str:doc_hash>', views.check_thesis_view, name='check_thesis'),
 ]
